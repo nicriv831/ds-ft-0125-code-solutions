@@ -1,0 +1,66 @@
+--#1
+-- Create a permanent table called ‘person_{your_name}’ in the “dsstudent” database.
+-- This table has 4 columns, ‘person_id’, ‘first_name’, ‘last_name’, ‘city’
+-- (‘person_id’ is the primary key)
+
+CREATE TABLE person_nick --
+	(person_id SMALLINT, 
+	first_name VARCHAR(20), 
+	last_name VARCHAR(20), 
+	city VARCHAR(20),
+	CONSTRAINT pk_persid PRIMARY KEY (person_id)
+	);
+
+-- #2 Insert a row of data into this table.
+
+INSERT INTO person_nick
+	(person_id, first_name, last_name, city)
+VALUES
+	(1, 'Nick', 'Rivelli', 'Petaluma');
+	
+-- #3 Insert 2 rows of data into this table
+	
+INSERT INTO person_nick
+	(person_id, first_name, last_name, city)
+VALUES
+	(2, 'Jenn', 'Whitehouse', 'Petaluma'),
+	(3, 'Dominic', 'Rivelli', 'Nashville');
+
+-- #4 Add a new column called ‘gender’ in the ‘person_{your_name}’ table
+
+ALTER TABLE person_nick
+	ADD gender CHAR(1);
+
+-- #5 Update data to this column -- the gender column
+
+UPDATE person_nick
+SET gender = 'M'
+WHERE
+	person_id = 1;
+
+UPDATE person_nick
+SET gender = 'F'
+WHERE
+	person_id = 2;
+
+UPDATE person_nick
+SET gender = 'M'
+WHERE
+	person_id = 3;
+
+-- #6 Delete the column ‘gender’ from the ‘person_{your_name}’ table
+	
+ALTER TABLE person_nick
+	DROP COLUMN gender;
+
+-- #7 Delete the row where ‘personal_id = 2’ from the ‘person_{your_name}’ table
+
+DELETE FROM person_nick
+WHERE person_id = 2
+
+-- #8 Drop the ‘person_{your_name}’ table from the ’dsstudent’ database.
+
+DROP TABLE person_nick
+
+
+
