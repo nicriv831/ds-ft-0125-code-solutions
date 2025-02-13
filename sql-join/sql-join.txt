@@ -1,0 +1,27 @@
+
+-- Write a SQL query to left outer join all the tables in the telecom database.
+--   Note: Only ”id”, “location”, “fault_severity”, “event_type”, “severity_type”, “resource_type”, “log_feature”, “volume” columns will be included.
+
+CREATE TEMPORARY TABLE dsstudent.sql_join_nick
+   (id SMALLINT, location VARCHAR(20), fault_severity SMALLINT, 
+   event_type VARCHAR(20), severity_type  VARCHAR(20), resource_type VARCHAR(20),
+   log_feature VARCHAR(20), volume SMALLINT);
+
+SELECT *
+FROM dsstudent.sql_join_nick;
+
+INSERT INTO dsstudent.sql_join_nick
+	(id, location, fault_severity, event_type, severity_type, resource_type, log_feature, volume)
+	SELECT t.id, t.location, t.fault_severity, et.event_type, st.severity_type, rt.resource_type, lf.log_feature, lf.volume
+	from train as t
+	left join event_type as et
+	on t.id = et.id
+	left join severity_type as st
+	on t.id = st.id
+	left join resource_type as rt
+	on t.id = rt.id
+	left join log_feature as lf
+	on t.id = lf.id;
+
+SELECT *
+FROM dsstudent.sql_join_nick;
