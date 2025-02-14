@@ -1,0 +1,74 @@
+-- Write SQL statements to return data of the following questions:
+--  For each location, what is the quantity of unique event types?
+
+CREATE TEMPORARY TABLE dsstudent.sql_groupby_aggregation_nick
+   (id SMALLINT, location VARCHAR(20), fault_severity SMALLINT, 
+   event_type VARCHAR(20), severity_type  VARCHAR(20), resource_type VARCHAR(20),
+   log_feature VARCHAR(20), volume SMALLINT);
+
+INSERT INTO dsstudent.sql_groupby_aggregation_nick
+	(id, location, fault_severity, event_type, severity_type, resource_type, log_feature, volume)
+	SELECT t.id, t.location, t.fault_severity, et.event_type, st.severity_type, rt.resource_type, lf.log_feature, lf.volume
+	from train as t
+	left join event_type as et
+	on t.id = et.id
+	left join severity_type as st
+	on t.id = st.id
+	left join resource_type as rt
+	on t.id = rt.id
+	left join log_feature as lf
+	on t.id = lf.id;
+
+SELECT * from dsstudent.sql_groupby_aggregation_nick;
+
+--  For each location, what is the quantity of unique event types?
+
+SELECT location, count(distinct event_type) as num_unique_event_type
+from dsstudent.sql_groupby_aggregation_nick
+group by location;
+
+-- What are the top 3 locations with the most volumes?
+
+SELECT location, sum(volume) as total_volume
+from dsstudent.sql_groupby_aggregation_nick
+group by location
+order by total_volume desc
+limit 3;
+
+-- For each fault severity, what is the quantity of unique locations?
+
+SELECT fault_severity, COUNT(DISTINCT location) AS num_of_unique_locations
+FROM dsstudent.sql_groupby_aggregation_nick
+GROUP BY fault_severity;
+
+-- From the query result above, what is the quantity of unique locations with the fault_severity greater than 1?
+
+SELECT fault_severity, COUNT(DISTINCT location) AS num_of_unique_locations
+FROM dsstudent.sql_groupby_aggregation_nick
+GROUP BY fault_severity
+HAVING fault_severity > 1;
+
+-- Write a SQL query to return the minimum, maximum, average of the field “Age” for each “Attrition” groups from the “hr” database.
+
+SELECT Attrition, MIN(Age), MAX(Age), AVG(Age)
+FROM hr.employee
+GROUP BY Attrition;
+
+-- Write a SQL query to return the “Attrition”, “Department” and the number of records from the
+-- ”hr” database for each group in the “Attrition” and “Department.” Sort the returned table by
+-- the “Attrition” and “Department” fields in ascending order.
+
+SELECT Attrition, Department, COUNT(*) AS num_quantity
+FROM hr.employee
+WHERE Attrition is not NULL
+GROUP BY Attrition, Department
+ORDER BY Attrition ASC;
+
+-- From Question #4 (above), can you return the results where the “num_quantity” is greater than 100 records?
+
+SELECT Attrition, Department, COUNT(*) AS num_quantity
+FROM hr.employee
+WHERE Attrition is not NULL
+GROUP BY Attrition, Department
+HAVING num_quantity > 100
+ORDER BY Attrition ASC;
