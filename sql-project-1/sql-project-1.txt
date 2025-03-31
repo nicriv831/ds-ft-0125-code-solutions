@@ -1,0 +1,147 @@
+-- In the ‘dsstudent’ database, create a permanent table named “customer_{your_name}.”
+
+CREATE TABLE customer_nick
+	(customer_id SMALLINT,
+	name VARCHAR(20),
+	location VARCHAR(20),
+	total_expenditure VARCHAR(20),
+	CONSTRAINT pk_custID PRIMARY KEY (customer_id)
+	);
+
+SELECT COLUMN_NAME as 'Field', COLUMN_TYPE as 'Type'
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'dsstudent'
+  AND TABLE_NAME = 'customer_nick'
+
+-- Insert the following records to the “customer_{your_name}” table:
+ 
+INSERT INTO customer_nick
+	(customer_id, name, location, total_expenditure)
+VALUES
+ 	(1701, 'John', 'Newport Beach, CA', '2000'),
+ 	(1707, 'Tracy', 'Irvine, CA', '1500'),
+ 	(1711, 'Daniel', 'Newport Beach, CA', '2500'),
+ 	(1703, 'Ella', 'Santa Ana, CA', '1800'),
+ 	(1708, 'Mel', 'Orange, CA', '1700'),
+ 	(1716, 'Steve', 'Irvine, CA', '18000');
+
+
+-- Oops! The value in the field ”total_expenditure” of Steve is not correct. It should be “1800.” Can you update this record?
+
+UPDATE customer_nick
+SET total_expenditure = '1800'
+WHERE
+	customer_id = 1716;
+
+-- We would like to update our customer data. Can you insert a new column called “gender” in the “customer_{your_name}” table?
+--   The datatype of this column is “VARCHAR(20)"
+
+ALTER TABLE customer_nick
+	ADD gender VARCHAR(20);
+
+-- Then, update the field “gender” with the following records:
+
+UPDATE customer_nick
+SET gender = 'M'
+	WHERE customer_id IN (1701, 1711, 1716);
+
+UPDATE customer_nick
+SET gender = 'F'
+	WHERE customer_id IN (1703, 1707, 1708);
+
+-- The customer, Steve, decides to quit our membership program, so delete his record from the “customer_{your_name}” table.
+
+DELETE FROM customer_nick
+WHERE
+	customer_id = 1716;
+
+-- Add a new column called “store” in the table “customer_{your_name}”
+
+ALTER TABLE customer_nick
+	ADD store VARCHAR(20);
+
+-- Then, delete the column called “store” in the table “customer_{your_name}” because you accidentally added it
+
+ALTER TABLE customer_nick
+	DROP store;
+
+-- Use “SELECT” & “FROM” to query the whole table “customer_{your_name}”
+
+SELECT *
+from customer_nick;
+
+-- Return “name” and “total_expenditure” fields from the table “customer_{your_name}”
+
+SELECT name, total_expenditure
+FROM customer_nick;
+
+-- Return “name” and “total_expenditure” fields from the table “customer_{your_name}” by using column alias
+-- (“AS” keyword)
+
+SELECT name AS n, total_expenditure as total_exp
+FROM customer_nick;
+
+-- Change the datatype of the field “total_expenditure” from “VARCHAR” to ”SMALLINT”
+
+ALTER TABLE customer_nick
+	MODIFY total_expenditure SMALLINT;
+
+SELECT COLUMN_NAME as Field, COLUMN_TYPE as Type
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'dsstudent'
+  AND TABLE_NAME = 'customer_nick';
+
+-- Sort the field “total_expenditure” in descending order
+  
+SELECT total_expenditure
+FROM customer_nick
+ORDER BY total_expenditure DESC;
+
+-- Return the top 3 customer names with the highest expenditure amount from the table “customer_{your_name}”
+
+SELECT name, total_expenditure
+FROM customer_nick
+ORDER BY total_expenditure DESC
+LIMIT 3
+
+-- Return the number of unique values of the field “location” and use the column alias to
+-- name the return field as “nuniques”
+
+SELECT COUNT(DISTINCT location) AS nuniques
+FROM customer_nick;
+
+-- Return the unique values of the field “location” and use the column alias
+-- to name the return field as “unique_cities”
+
+SELECT DISTINCT location AS unique_cities
+FROM customer_nick;
+
+-- Return the data where the gender is male
+
+SELECT *
+FROM customer_nick
+WHERE gender = 'M'
+
+-- Return the data where the gender is female.
+
+SELECT *
+FROM customer_nick
+WHERE gender = 'F'
+
+-- Return the data where the location is “Irvine, CA”
+
+SELECT *
+FROM customer_nick
+WHERE location = 'Irvine, CA'
+
+-- Return “name” and “location” where the ”total_expenditure” is less
+-- than 2000 and sort the result by the field “name” in ascending order
+
+SELECT name, location
+FROM customer_nick
+WHERE total_expenditure < 2000
+ORDER BY name ASC
+
+-- Drop the table “customer_{your_name}” after you finish all the questions.
+
+DROP TABLE customer_nick
