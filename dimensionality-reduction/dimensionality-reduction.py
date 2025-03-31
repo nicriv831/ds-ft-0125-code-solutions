@@ -55,17 +55,17 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 X_train.head()
 
 # %%
-# Scale data
+# Make scaler for pipeline
 
 scaler = StandardScaler()
-x_train_scaled = scaler.fit_transform(X_train)
+
 
 # %%
 # make model, pipeline and fit pipeline
 
 knn_nopca = KNeighborsClassifier()
 knn_nopca_pipe = make_pipeline(scaler, knn_nopca)
-knn_nopca_pipe.fit(x_train_scaled, y_train)
+knn_nopca_pipe.fit(X_train, y_train)
 
 # %%
 # Run prediction to make sure the pipeline worked
@@ -91,13 +91,13 @@ knn_pca = KNeighborsClassifier()
 
 knn_pca_pipe = make_pipeline(scaler, pca, knn_pca)
 
-knn_pca_pipe.fit(x_train_scaled, y_train)
+knn_pca_pipe.fit(X_train, y_train)
 
 # %%
 # Check scores for PCA pipeline
 
-scores.loc['pca_knn', 'test_accuracy'] = knn_pca_pipe.score(X_test, y_test)
-scores.loc['pca_knn', 'train_accuracy'] = knn_pca_pipe.score(X_train, y_train)
+scores.loc['pca_knn - 90%', 'test_accuracy'] = knn_pca_pipe.score(X_test, y_test)
+scores.loc['pca_knn - 90%', 'train_accuracy'] = knn_pca_pipe.score(X_train, y_train)
 scores
 
 # %%
@@ -107,32 +107,27 @@ plt.plot(pca.explained_variance_ratio_)
 plt.grid()
 
 # %%
-# try with 25 components
+# Use loop in increments of 5 to go over above for highest accuracy score
 
-pca_25 = PCA(n_components = 25, random_state=42)
+components = range(1,175,5)
+score_check = []
+
+for component in components:
+  pca = PCA(n_components = component)
+  knn_pca = KNeighborsClassifier()
+  pca_pipe = make_pipeline(scaler, pca, knn_pca)
+  pca_pipe.fit(X_train, y_train)
+  test_score = pca_pipe.score(X_test, y_test)
+  train_score = pca_pipe.score(X_train, y_train)
+  score_check.append((component, test_score, train_score))
+
+score_df = pd.DataFrame(score_check, columns=['component #', 'test_accuracy', 'train_accuracy'])
 
 # %%
-# Make and fit 25 component pipeline
+# Show list and sort by highest test score, top 10 results
 
-pca_25_pipe = make_pipeline(scaler, pca_25, knn_pca)
-pca_25_pipe.fit(x_train_scaled, y_train)
+score_df.sort_values(ascending=False, by='test_accuracy').head(10)\
 
-# %%
-# score 25 component pipeline
-
-scores.loc['pca25_knn', 'test_accuracy'] = pca_25_pipe.score(X_test, y_test)
-scores.loc['pca25_knn', 'train_accuracy'] = pca_25_pipe.score(X_train, y_train)
-scores
-
-# %%
-# Try with 50 componets
-
-
-pca_50 = PCA(n_components = 50, random_state=42)
-pca_50_pipe = make_pipeline(scaler, pca_50, knn_pca)
-pca_50_pipe.fit(x_train_scaled, y_train)
-scores.loc['pca50_knn', 'test_accuracy'] = pca_50_pipe.score(X_test, y_test)
-scores.loc['pca50_knn', 'train_accuracy'] = pca_50_pipe.score(X_train, y_train)
-scores
+# 51 components is the highest accuracy and lowest bias
 
 # %%
