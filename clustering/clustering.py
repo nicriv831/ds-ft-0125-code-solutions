@@ -56,11 +56,19 @@ for_model['price'].value_counts()
 for_model['horsepower'].value_counts()
 
 # %%
-# Replace ? with nan
+# How many ?s/NaNs
 
-for_model['horsepower'] = for_model['horsepower'].replace('?', np.nan)
-(for_model['horsepower'] == '?').sum()
+print(f' horsepower ?s - {(for_model['horsepower'] == '?').sum()}')
+print(f' price ?s - {(for_model['price'] == '?').sum()}')
 
+# %%
+# Less than 10% of data are ?s which are really Nans, drop these rows
+
+for_model = for_model[for_model['horsepower'] != '?']
+print(f' horsepower ?s - {(for_model['horsepower'] == '?').sum()}')
+
+for_model = for_model[for_model['price'] != '?']
+print(f' price ?s - {(for_model['price'] == '?').sum()}')
 
 # %%
 # change datatype to numeric
@@ -68,27 +76,9 @@ for_model['horsepower'] = for_model['horsepower'].replace('?', np.nan)
 for_model['horsepower'] = for_model['horsepower'].astype('float')
 
 # %%
-# compute mean and impute
-
-hp_mean = for_model['horsepower'].mean()
-for_model['horsepower'] = for_model['horsepower'].fillna(hp_mean)
-
-# %%
-# Replace price ? with nan
-
-for_model['price'] = for_model['price'].replace('?', np.nan)
-(for_model['price'] == '?').sum()
-
-# %%
 # change datatype to numeric
 
 for_model['price'] = for_model['price'].astype('float')
-
-# %%
-# compute mean and impiute for nan
-
-price_mean = for_model['price'].mean()
-for_model['price'] = for_model['price'].fillna(price_mean)
 
 # %%
 # check all work above
@@ -116,12 +106,16 @@ charter = scaled_df.copy()
 
 charter['cluster'] = kmeans.labels_
 
-charter.head()
+charter.head(20)
 
 # %%
 # Plot clusters
 
 plt.scatter(charter['horsepower'], charter['price'], c=charter['cluster'])
+
+# Cluster one looks to be mostly those that have one or both numbers above 1. There are some in cluster 1 that values below 1 both there are few.
+# Both groups are similar in that there looks to be a positive correlation between price and horsepower
+# Both groups are different in that group one is those with higher horsepower/price and group 0 is those with less
 
 # %%
 # Make loop to check for best value of k
@@ -179,9 +173,31 @@ n_th_neighbors_sorted = np.sort(n_th_neighbor)
 n_th_neighbors_sorted
 
 # %%
+
+
+# %%
 # Plot with epsilon to visualize
 
 epsilon = .77
+plt.plot(n_th_neighbors_sorted)
+plt.ylabel(f'distance to {min_samples}th neighbor')
+plt.xlabel('sorted data points')
+plt.axhline(y=epsilon, color='r')
+plt.grid()
+
+# %%
+#Elbow in plot looks to be .77 epsilon, will check percentiles to make sure
+
+eps_perc = np.percentile(n_th_neighbors_sorted, [90, 95, 99])
+print(eps_perc)
+
+# %%
+# 95th percentile is epsion .61, will use this instead
+
+# %%
+# Plot with epsilon at .61 to visualize
+
+epsilon = .61
 plt.plot(n_th_neighbors_sorted)
 plt.ylabel(f'distance to {min_samples}th neighbor')
 plt.xlabel('sorted data points')
@@ -204,3 +220,5 @@ np.unique(dbs.labels_)
 # Plot to visualize outliers
 
 plt.scatter(scaled_df.iloc[:,0], scaled_df.iloc[:,1], c=dbs.labels_)
+
+# %%
